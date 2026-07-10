@@ -607,22 +607,23 @@
         formData.append('photo_mimetype', photoFile.type);
       }
 
-      // Build a readable order summary and add it as a field
+      // Build combined order summary plus subtotal
       const rows = itemRows.querySelectorAll('.item-row');
       let summary = '';
-      let grandTotal = 0;
+      let itemsSubtotal = 0;
       rows.forEach(row => {
         const sel = row.querySelector('.item-select');
         const qty = row.querySelector('.item-qty');
         if(sel.value){
           const q = parseInt(qty.value, 10) || 1;
-          grandTotal += priceOf(sel.value) * q;
+          itemsSubtotal += priceOf(sel.value) * q;
           summary += `${sel.value} x${q}\n`;
         }
       });
       const ongkir = parseInt(document.getElementById('shippingCost').value, 10) || 0;
-      grandTotal += ongkir;
+      const grandTotal = itemsSubtotal + ongkir;
       formData.append('order_summary', summary || 'No items selected');
+      formData.append('items_subtotal', formatRupiah(itemsSubtotal));
       formData.append('shipping_cost_display', formatRupiah(ongkir));
       formData.append('total_price', formatRupiah(grandTotal));
 
