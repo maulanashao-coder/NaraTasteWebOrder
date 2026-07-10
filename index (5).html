@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Order Form — Menu</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --slate: #F1E7D6;
+    --slate-2: #FBF4E6;
+    --paper: #FFFDF8;
+    --paper-dim: #F3EAD9;
+    --ink: #2E2115;
+    --flame: #A5572E;
+    --flame-dim: #8B4523;
+    --sage: #5F7845;
+    --brass: #8B6B33;
+    --line: rgba(46,33,21,0.16);
+    --ink-soft: rgba(46,33,21,0.55);
+  }
+
+  *{ box-sizing:border-box; }
+  html,body{ margin:0; padding:0; }
+  body{
+    background: var(--slate);
+    color: var(--ink);
+    font-family: 'Inter', sans-serif;
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .wrap{
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 48px 24px 80px;
+  }
+
+  header{
+    display:flex;
+    align-items:baseline;
+    justify-content:space-between;
+    gap: 16px;
+    margin-bottom: 40px;
+    flex-wrap: wrap;
+    border-bottom: 1px solid var(--line);
+    padding-bottom: 24px;
+  }
+  .brand-eyebrow{
+    font-family:'IBM Plex Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--brass);
+  }
+  h1{
+    font-family:'Playfair Display', serif;
+    font-weight: 700;
+    font-size: clamp(32px, 5vw, 52px);
+    letter-spacing: 0.06em;
+    margin: 6px 0 0;
+    text-transform: uppercase;
+  }
+  .tagline{
+    font-size: 14px;
+    color: var(--ink-soft);
+    max-width: 320px;
+    text-align: right;
+  }
+
+  .grid{
+    display:grid;
+    grid-template-columns: 1.15fr 0.85fr;
+    gap: 40px;
+    align-items: start;
+  }
+  @media (max-width: 860px){
+    .grid{ grid-template-columns: 1fr; }
+  }
+
+  /* ---- FORM ---- */
+  .panel{
+    background: var(--slate-2);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    padding: 32px;
+  }
+  .field{ margin-bottom: 22px; }
+  .field label{
+    display:block;
+    font-family:'IBM Plex Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--brass);
+    margin-bottom: 8px;
+  }
+  .field .hint{
+    font-size: 12px;
+    color: var(--ink-soft);
+    margin-top: 6px;
+  }
+  input[type=text], input[type=tel], input[type=email], input[type=date], select, textarea{
+    width: 100%;
+    background: var(--paper);
+    border: 1px solid var(--line);
+    color: var(--ink);
+    font-family: 'Inter', sans-serif;
+    font-size: 15px;
+    padding: 12px 14px;
+    border-radius: 3px;
+    transition: border-color .15s ease;
+  }
+  input:focus, select:focus, textarea:focus{
+    outline: none;
+    border-color: var(--flame);
+  }
+  textarea{ min-height: 84px; resize: vertical; }
+
+  .row-2{
+    display:grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+  @media (max-width: 520px){ .row-2{ grid-template-columns: 1fr; } }
+
+  .item-row{
+    display:grid;
+    grid-template-columns: 1fr 90px 34px;
+    gap: 10px;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+  .item-row select{ padding: 10px 12px; }
+  .item-row input{ padding: 10px 12px; text-align:center; }
+  .remove-item{
+    background: transparent;
+    border: 1px solid var(--line);
+    color: var(--ink-soft);
+    width: 34px; height: 40px;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 16px;
+    line-height: 1;
+  }
+  .remove-item:hover{ border-color: var(--flame); color: var(--flame); }
+
+  .add-item-btn{
+    background: transparent;
+    border: 1px dashed var(--line);
+    color: var(--sage);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.05em;
+    padding: 10px 14px;
+    border-radius: 3px;
+    cursor: pointer;
+    width: 100%;
+    margin-top: 4px;
+  }
+  .add-item-btn:hover{ border-color: var(--sage); }
+
+  /* upload */
+  .upload-box{
+    border: 1px dashed var(--line);
+    border-radius: 3px;
+    padding: 20px;
+    text-align: center;
+    cursor: pointer;
+    position: relative;
+    transition: border-color .15s ease, background .15s ease;
+  }
+  .upload-box:hover{ border-color: var(--brass); background: rgba(139,107,51,0.06); }
+  .upload-box input[type=file]{
+    position:absolute; inset:0; opacity:0; cursor:pointer; width:100%; height:100%;
+  }
+  .upload-box .icon{ font-size: 22px; margin-bottom: 6px; }
+  .upload-box .main-txt{ font-size: 13px; color: var(--ink); }
+  .upload-box .sub-txt{ font-size: 11px; color: var(--ink-soft); margin-top: 4px; }
+  #imgPreview{
+    margin-top: 12px;
+    max-width: 100%;
+    max-height: 160px;
+    border-radius: 3px;
+    display: none;
+  }
+
+  .submit-btn{
+    width: 100%;
+    background: var(--flame);
+    color: var(--paper);
+    border: none;
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    font-size: 16px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 16px;
+    border-radius: 3px;
+    cursor: pointer;
+    margin-top: 8px;
+    transition: background .15s ease;
+  }
+  .submit-btn:hover{ background: var(--flame-dim); }
+  .submit-btn:disabled{ opacity: 0.6; cursor: not-allowed; }
+
+  .status-msg{
+    margin-top: 14px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 13px;
+    display: none;
+  }
+  .status-msg.ok{ color: var(--sage); display:block; }
+  .status-msg.err{ color: var(--flame); display:block; }
+
+  /* ---- TICKET / SIGNATURE ELEMENT ---- */
+  .ticket-outer{ position: sticky; top: 32px; }
+  .ticket{
+    background: var(--paper);
+    color: var(--ink);
+    border-radius: 2px;
+    padding: 28px 24px 32px;
+    font-family: 'IBM Plex Mono', monospace;
+    box-shadow: 0 20px 45px rgba(46,33,21,0.18);
+    position: relative;
+    clip-path: polygon(
+      0% 0%, 100% 0%, 100% 96%,
+      95% 100%, 90% 96%, 85% 100%, 80% 96%, 75% 100%, 70% 96%,
+      65% 100%, 60% 96%, 55% 100%, 50% 96%, 45% 100%, 40% 96%,
+      35% 100%, 30% 96%, 25% 100%, 20% 96%, 15% 100%, 10% 96%, 5% 100%, 0% 96%
+    );
+  }
+  .ticket-head{
+    text-align:center;
+    border-bottom: 1px dashed var(--ink);
+    padding-bottom: 14px;
+    margin-bottom: 14px;
+  }
+  .ticket-head .store{
+    font-family:'Playfair Display', serif;
+    font-weight:700;
+    font-size: 20px;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+  }
+  .ticket-head .meta{ font-size: 11px; color: #6b675d; margin-top: 4px; }
+
+  .ticket-line{
+    display:flex;
+    justify-content: space-between;
+    font-size: 12.5px;
+    margin-bottom: 6px;
+    gap: 10px;
+  }
+  .ticket-line .k{ color: #6b675d; }
+  .ticket-line .v{ text-align:right; font-weight: 500; word-break: break-word; max-width: 60%; }
+
+  .ticket-divider{
+    border-top: 1px dashed var(--ink);
+    margin: 14px 0;
+  }
+
+  .ticket-items .item-line{
+    display:flex;
+    justify-content: space-between;
+    font-size: 13px;
+    margin-bottom: 5px;
+  }
+  .ticket-items .item-name{ flex:1; }
+  .ticket-items .item-qty{ color: #6b675d; margin: 0 8px; }
+
+  .ticket-empty{
+    font-size: 12px;
+    color: #a39d8c;
+    font-style: italic;
+    text-align: center;
+    padding: 10px 0;
+  }
+
+  .ticket-note{
+    font-size: 12px;
+    margin-top: 10px;
+    color: #4a4740;
+  }
+  .ticket-note .k{ color: #6b675d; display:block; margin-bottom: 2px; }
+
+  .ticket-photo-tag{
+    display:inline-block;
+    font-size: 11px;
+    background: var(--sage);
+    color: var(--paper);
+    padding: 3px 8px;
+    border-radius: 2px;
+    margin-top: 8px;
+  }
+
+  .ticket-foot{
+    text-align:center;
+    margin-top: 18px;
+    font-size: 11px;
+    color: #a39d8c;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  ::selection{ background: var(--flame); color: var(--paper); }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header style="display:block;">
+    <div class="brand-eyebrow">Online Order · Menu Form</div>
+    <h1 style="margin-bottom:6px;">Nara Taste</h1>
+    <div class="tagline" style="text-align:left; max-width:none;">Send from Nara House - Depok</div>
+  </header>
+
+  <div class="grid">
+
+    <!-- FORM -->
+    <div class="panel">
+      <form id="orderForm">
+        <!-- Submits to a Google Apps Script Web App, which writes to a Google Sheet -->
+        <!-- Paste your deployed script URL into APPS_SCRIPT_URL below in the <script> section -->
+        <input type="hidden" name="dummy" value="">
+
+        <div class="row-2">
+          <div class="field">
+            <label for="name">Full name</label>
+            <input type="text" id="name" name="name" required placeholder="e.g. Sinta Wulandari">
+          </div>
+          <div class="field">
+            <label for="phone">Phone / WhatsApp</label>
+            <input type="tel" id="phone" name="phone" required placeholder="e.g. 0812xxxxxxx">
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="address">Delivery address <span style="color:var(--ink-soft); text-transform:none; letter-spacing:0;">(Apabila pickup sendiri, silakan tulis "Pickup")</span></label>
+          <textarea id="address" name="address" required placeholder="Street, house/unit number, area, city"></textarea>
+        </div>
+
+        <div class="field">
+          <label for="deliveryDate">Tanggal pengiriman</label>
+          <input type="date" id="deliveryDate" name="delivery_date" required>
+        </div>
+
+        <div class="field">
+          <label>Menu items</label>
+          <div id="itemRows"></div>
+          <button type="button" class="add-item-btn" id="addItemBtn">+ add another item</button>
+        </div>
+
+        <div class="field">
+          <label for="shippingCost">Ongkos Kirim (Rp)</label>
+          <input type="number" id="shippingCost" name="shipping_cost" min="0" step="500" placeholder="0">
+          <div class="hint">Kosongkan atau isi 0 kalau pickup sendiri</div>
+        </div>
+
+        <div class="field">
+          <label for="notes">Special instructions</label>
+          <textarea id="notes" name="notes" placeholder="e.g. no chili, deliver after 6pm"></textarea>
+        </div>
+
+        <div class="field">
+          <div style="background: var(--paper); border: 1px solid var(--line); border-left: 3px solid var(--flame); border-radius: 3px; padding: 14px 16px;">
+            <div style="font-family:'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--brass); margin-bottom: 6px;">Informasi Pembayaran</div>
+            <div style="font-size: 14px; line-height: 1.5;">
+              Pembayaran ke rekening <strong>Mandiri 9000034056045</strong><br>
+              a/n <strong>Annisa Qonita</strong>
+            </div>
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Upload photo <span style="color:var(--ink-soft); text-transform:none; letter-spacing:0;">(payment proof, or a reference photo)</span></label>
+          <div class="upload-box" id="uploadBox">
+            <input type="file" id="fileInput" name="attachment" accept="image/*">
+            <div class="icon">📎</div>
+            <div class="main-txt" id="uploadMainTxt">Tap to choose a photo</div>
+            <div class="sub-txt">JPG or PNG, up to 5MB</div>
+            <img id="imgPreview" alt="preview">
+          </div>
+        </div>
+
+        <button type="submit" class="submit-btn" id="submitBtn">Send order</button>
+        <div class="status-msg" id="statusMsg"></div>
+      </form>
+    </div>
+
+    <!-- LIVE TICKET -->
+    <div class="ticket-outer">
+      <div class="ticket">
+        <div class="ticket-head">
+          <div class="store">Nara Taste</div>
+          <div class="meta">Order slip · <span id="ticketTime"></span></div>
+        </div>
+
+        <div class="ticket-line"><span class="k">Name</span><span class="v" id="tName">—</span></div>
+        <div class="ticket-line"><span class="k">Phone</span><span class="v" id="tPhone">—</span></div>
+        <div class="ticket-line"><span class="k">Deliver to</span><span class="v" id="tAddress">—</span></div>
+        <div class="ticket-line"><span class="k">Tanggal kirim</span><span class="v" id="tDate">—</span></div>
+
+        <div class="ticket-divider"></div>
+
+        <div class="ticket-items" id="tItems">
+          <div class="ticket-empty">no items added yet</div>
+        </div>
+
+        <div class="ticket-divider"></div>
+
+        <div class="ticket-line"><span class="k">Ongkir</span><span class="v" id="tOngkir">Rp 0</span></div>
+
+        <div class="ticket-line" style="font-size:14px; font-weight:600;">
+          <span class="k" style="color:var(--ink);">Total</span>
+          <span class="v" id="tTotal">Rp 0</span>
+        </div>
+
+        <div class="ticket-divider"></div>
+
+        <div class="ticket-note">
+          <span class="k">Notes</span>
+          <span id="tNotes">—</span>
+        </div>
+
+        <div id="tPhotoWrap"></div>
+
+        <div class="ticket-foot">Thanks for your order</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  const MENU = [
+    { value: "", price: 0, label: "Choose an item…" },
+    { value: "Mango Sticky Rice", price: 20000, label: "Mango Sticky Rice — Rp 20.000" },
+    { value: "Nangka Sticky Rice", price: 20000, label: "Nangka Sticky Rice — Rp 20.000" },
+    { value: "Es Pisang Ijo", price: 25000, label: "Es Pisang Ijo — Rp 25.000" },
+    { value: "Klepon Cadbury isi 10", price: 25000, label: "Klepon Cadbury isi 10 — Rp 25.000" },
+    { value: "Klepon Cadbury isi 5", price: 15000, label: "Klepon Cadbury isi 5 — Rp 15.000" },
+    { value: "Beef Mayo Pedas Frozen", price: 25000, label: "Beef Mayo Pedas Frozen — Rp 25.000" },
+    { value: "Beef Mayo Pedas Goreng", price: 28000, label: "Beef Mayo Pedas Goreng — Rp 28.000" },
+    { value: "Beef Mayo Ori Frozen", price: 25000, label: "Beef Mayo Ori Frozen — Rp 25.000" },
+    { value: "Beef Mayo Ori Goreng", price: 28000, label: "Beef Mayo Ori Goreng — Rp 28.000" },
+    { value: "Risol Rogut Frozen", price: 25000, label: "Risol Rogut Frozen — Rp 25.000" },
+    { value: "Risol Rogut Goreng", price: 28000, label: "Risol Rogut Goreng — Rp 28.000" },
+  ];
+
+  function priceOf(itemName){
+    const m = MENU.find(x => x.value === itemName);
+    return m ? m.price : 0;
+  }
+
+  function formatRupiah(n){
+    return 'Rp ' + n.toLocaleString('id-ID');
+  }
+
+  let itemCount = 0;
+  const itemRows = document.getElementById('itemRows');
+  const addItemBtn = document.getElementById('addItemBtn');
+
+  function menuOptionsHtml(){
+    return MENU.map(m => `<option value="${m.value}">${m.label}</option>`).join('');
+  }
+
+  function addItemRow(){
+    itemCount++;
+    const id = itemCount;
+    const row = document.createElement('div');
+    row.className = 'item-row';
+    row.dataset.rowId = id;
+    row.innerHTML = `
+      <select name="item_${id}" class="item-select">${menuOptionsHtml()}</select>
+      <input type="number" name="qty_${id}" class="item-qty" min="1" value="1">
+      <button type="button" class="remove-item" title="Remove">×</button>
+    `;
+    itemRows.appendChild(row);
+
+    row.querySelector('.item-select').addEventListener('change', updateTicket);
+    row.querySelector('.item-qty').addEventListener('input', updateTicket);
+    row.querySelector('.remove-item').addEventListener('click', () => {
+      row.remove();
+      updateTicket();
+    });
+    updateTicket();
+  }
+
+  addItemBtn.addEventListener('click', addItemRow);
+  addItemRow(); // start with one row
+
+  // live text fields
+  ['name','phone','address','notes','deliveryDate','shippingCost'].forEach(id => {
+    document.getElementById(id).addEventListener('input', updateTicket);
+  });
+
+  const deliveryDateInput = document.getElementById('deliveryDate');
+  const todayStr = new Date().toISOString().split('T')[0];
+  deliveryDateInput.min = todayStr;
+
+  function updateTicket(){
+    document.getElementById('tName').textContent = document.getElementById('name').value.trim() || '—';
+    document.getElementById('tPhone').textContent = document.getElementById('phone').value.trim() || '—';
+    document.getElementById('tAddress').textContent = document.getElementById('address').value.trim() || '—';
+    const dateVal = document.getElementById('deliveryDate').value;
+    document.getElementById('tDate').textContent = dateVal ? new Date(dateVal + 'T00:00:00').toLocaleDateString('id-ID', { day:'numeric', month:'long', year:'numeric' }) : '—';
+    document.getElementById('tNotes').textContent = document.getElementById('notes').value.trim() || '—';
+
+    const rows = itemRows.querySelectorAll('.item-row');
+    const tItems = document.getElementById('tItems');
+    let html = '';
+    let any = false;
+    let grandTotal = 0;
+    rows.forEach(row => {
+      const sel = row.querySelector('.item-select');
+      const qty = row.querySelector('.item-qty');
+      if(sel.value){
+        any = true;
+        const q = parseInt(qty.value, 10) || 1;
+        const lineTotal = priceOf(sel.value) * q;
+        grandTotal += lineTotal;
+        html += `<div class="item-line"><span class="item-name">${sel.value} ×${q}</span><span>${formatRupiah(lineTotal)}</span></div>`;
+      }
+    });
+    tItems.innerHTML = any ? html : '<div class="ticket-empty">no items added yet</div>';
+
+    const ongkir = parseInt(document.getElementById('shippingCost').value, 10) || 0;
+    document.getElementById('tOngkir').textContent = formatRupiah(ongkir);
+    grandTotal += ongkir;
+    document.getElementById('tTotal').textContent = formatRupiah(grandTotal);
+
+    const now = new Date();
+    document.getElementById('ticketTime').textContent = now.toLocaleString();
+  }
+
+  // file upload preview
+  const fileInput = document.getElementById('fileInput');
+  const imgPreview = document.getElementById('imgPreview');
+  const uploadMainTxt = document.getElementById('uploadMainTxt');
+  const tPhotoWrap = document.getElementById('tPhotoWrap');
+
+  fileInput.addEventListener('change', () => {
+    const file = fileInput.files[0];
+    if(!file){
+      imgPreview.style.display = 'none';
+      tPhotoWrap.innerHTML = '';
+      uploadMainTxt.textContent = 'Tap to choose a photo';
+      return;
+    }
+    uploadMainTxt.textContent = file.name;
+    const reader = new FileReader();
+    reader.onload = e => {
+      imgPreview.src = e.target.result;
+      imgPreview.style.display = 'block';
+      tPhotoWrap.innerHTML = '<span class="ticket-photo-tag">📷 photo attached</span>';
+    };
+    reader.readAsDataURL(file);
+  });
+
+  updateTicket();
+
+  // submission
+  const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbygZ_y90gKOL2dYxanWlAFCoZL4isAg7eTpNzsEd0xkjwGqfa3y5RMaQ1im53kVnAilOg/exec';
+
+  const form = document.getElementById('orderForm');
+  const submitBtn = document.getElementById('submitBtn');
+  const statusMsg = document.getElementById('statusMsg');
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    statusMsg.className = 'status-msg';
+    statusMsg.textContent = '';
+
+    if(!APPS_SCRIPT_URL || APPS_SCRIPT_URL === 'PASTE_YOUR_APPS_SCRIPT_WEB_APP_URL_HERE'){
+      statusMsg.className = 'status-msg err';
+      statusMsg.textContent = 'Form isn\'t connected yet — add your Google Apps Script Web App URL to enable sending.';
+      return;
+    }
+
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Sending…';
+
+    try {
+      const formData = new FormData(form);
+      formData.delete('attachment');
+
+      // Convert the selected photo to base64 text so Apps Script can reliably decode it
+      const photoFile = fileInput.files[0];
+      if(photoFile){
+        const base64 = await new Promise((resolve, reject) => {
+          const r = new FileReader();
+          r.onload = () => resolve(r.result.split(',')[1]);
+          r.onerror = reject;
+          r.readAsDataURL(photoFile);
+        });
+        formData.append('photo_base64', base64);
+        formData.append('photo_filename', photoFile.name);
+        formData.append('photo_mimetype', photoFile.type);
+      }
+
+      // Build a readable order summary and add it as a field
+      const rows = itemRows.querySelectorAll('.item-row');
+      let summary = '';
+      let grandTotal = 0;
+      rows.forEach(row => {
+        const sel = row.querySelector('.item-select');
+        const qty = row.querySelector('.item-qty');
+        if(sel.value){
+          const q = parseInt(qty.value, 10) || 1;
+          grandTotal += priceOf(sel.value) * q;
+          summary += `${sel.value} x${q}\n`;
+        }
+      });
+      const ongkir = parseInt(document.getElementById('shippingCost').value, 10) || 0;
+      grandTotal += ongkir;
+      formData.append('order_summary', summary || 'No items selected');
+      formData.append('shipping_cost_display', formatRupiah(ongkir));
+      formData.append('total_price', formatRupiah(grandTotal));
+
+      const res = await fetch(APPS_SCRIPT_URL, {
+        method: 'POST',
+        body: formData
+      });
+      const data = await res.json();
+
+      if(data.success){
+        statusMsg.className = 'status-msg ok';
+        statusMsg.textContent = '✓ Order sent! We\'ll be in touch shortly.';
+        form.reset();
+        itemRows.innerHTML = '';
+        itemCount = 0;
+        addItemRow();
+        imgPreview.style.display = 'none';
+        tPhotoWrap.innerHTML = '';
+        uploadMainTxt.textContent = 'Tap to choose a photo';
+        updateTicket();
+      } else {
+        throw new Error(data.message || 'Submission failed');
+      }
+    } catch(err){
+      statusMsg.className = 'status-msg err';
+      statusMsg.textContent = 'Something went wrong sending your order. Please try again.';
+    } finally {
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Send order';
+    }
+  });
+</script>
+</body>
+</html>
