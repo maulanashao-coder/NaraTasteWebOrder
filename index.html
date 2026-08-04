@@ -125,15 +125,23 @@
   }
   @media (max-width: 520px){ .row-2{ grid-template-columns: 1fr; } }
 
+  .item-block{ margin-bottom: 10px; }
   .item-row{
     display:grid;
     grid-template-columns: 1fr 90px 34px;
     gap: 10px;
     align-items: center;
-    margin-bottom: 10px;
+    margin-bottom: 0;
   }
   .item-row select{ padding: 10px 12px; }
   .item-row input{ padding: 10px 12px; text-align:center; }
+  .custom-fields{
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-top: 8px;
+  }
+  .custom-fields input{ padding: 9px 12px; text-align:left; font-size: 13.5px; }
   .remove-item{
     background: transparent;
     border: 1px solid var(--line);
@@ -455,11 +463,26 @@
     { value: "Risol Rogut Frozen", price: 25000, label: "Risol Rogut Frozen — Rp 25.000" },
     { value: "Risol Rogut Goreng", price: 28000, label: "Risol Rogut Goreng — Rp 28.000" },
     { value: "Paket Snack", price: 24000, label: "Paket Snack — Rp 24.000" },
+    { value: "__custom__", price: 0, label: "✏️ Menu custom (tulis sendiri)" },
   ];
 
   function priceOf(itemName){
     const m = MENU.find(x => x.value === itemName);
     return m ? m.price : 0;
+  }
+
+  // Returns {name, price, valid} for a given item row, handling both
+  // regular menu selections and the custom "type your own" option.
+  function getItemInfo(row){
+    const sel = row.querySelector('.item-select');
+    if(sel.value === '__custom__'){
+      const nameInput = row.querySelector('.custom-name');
+      const priceInput = row.querySelector('.custom-price');
+      const name = nameInput ? nameInput.value.trim() : '';
+      const price = priceInput ? (parseInt(priceInput.value, 10) || 0) : 0;
+      return { name, price, valid: !!name };
+    }
+    return { name: sel.value, price: priceOf(sel.value), valid: !!sel.value };
   }
 
   function formatRupiah(n){
@@ -478,16 +501,30 @@
     itemCount++;
     const id = itemCount;
     const row = document.createElement('div');
-    row.className = 'item-row';
+    row.className = 'item-block';
     row.dataset.rowId = id;
     row.innerHTML = `
-      <select name="item_${id}" class="item-select">${menuOptionsHtml()}</select>
-      <input type="number" name="qty_${id}" class="item-qty" min="1" value="1">
-      <button type="button" class="remove-item" title="Remove">×</button>
+      <div class="item-row">
+        <select name="item_${id}" class="item-select">${menuOptionsHtml()}</select>
+        <input type="number" name="qty_${id}" class="item-qty" min="1" value="1">
+        <button type="button" class="remove-item" title="Remove">×</button>
+      </div>
+      <div class="custom-fields" style="display:none;">
+        <input type="text" name="custom_name_${id}" class="custom-name" placeholder="Nama menu custom">
+        <input type="number" name="custom_price_${id}" class="custom-price" min="0" step="500" placeholder="Harga (Rp)">
+      </div>
     `;
     itemRows.appendChild(row);
 
-    row.querySelector('.item-select').addEventListener('change', updateTicket);
+    const selectEl = row.querySelector('.item-select');
+    const customFields = row.querySelector('.custom-fields');
+
+    selectEl.addEventListener('change', () => {
+      customFields.style.display = selectEl.value === '__custom__' ? 'grid' : 'none';
+      updateTicket();
+    });
+    row.querySelector('.custom-name').addEventListener('input', updateTicket);
+    row.querySelector('.custom-price').addEventListener('input', updateTicket);
     row.querySelector('.item-qty').addEventListener('input', updateTicket);
     row.querySelector('.remove-item').addEventListener('click', () => {
       row.remove();
@@ -516,20 +553,20 @@
     document.getElementById('tDate').textContent = dateVal ? new Date(dateVal + 'T00:00:00').toLocaleDateString('id-ID', { day:'numeric', month:'long', year:'numeric' }) : '—';
     document.getElementById('tNotes').textContent = document.getElementById('notes').value.trim() || '—';
 
-    const rows = itemRows.querySelectorAll('.item-row');
+    const rows = itemRows.querySelectorAll('.item-block');
     const tItems = document.getElementById('tItems');
     let html = '';
     let any = false;
     let grandTotal = 0;
     rows.forEach(row => {
-      const sel = row.querySelector('.item-select');
+      const info = getItemInfo(row);
       const qty = row.querySelector('.item-qty');
-      if(sel.value){
+      if(info.valid){
         any = true;
         const q = parseInt(qty.value, 10) || 1;
-        const lineTotal = priceOf(sel.value) * q;
+        const lineTotal = info.price * q;
         grandTotal += lineTotal;
-        html += `<div class="item-line"><span class="item-name">${sel.value} ×${q}</span><span>${formatRupiah(lineTotal)}</span></div>`;
+        html += `<div class="item-line"><span class="item-name">${info.name} ×${q}</span><span>${formatRupiah(lineTotal)}</span></div>`;
       }
     });
     tItems.innerHTML = any ? html : '<div class="ticket-empty">no items added yet</div>';
@@ -609,16 +646,16 @@
       }
 
       // Build combined order summary plus subtotal
-      const rows = itemRows.querySelectorAll('.item-row');
+      const rows = itemRows.querySelectorAll('.item-block');
       let summary = '';
       let itemsSubtotal = 0;
       rows.forEach(row => {
-        const sel = row.querySelector('.item-select');
+        const info = getItemInfo(row);
         const qty = row.querySelector('.item-qty');
-        if(sel.value){
+        if(info.valid){
           const q = parseInt(qty.value, 10) || 1;
-          itemsSubtotal += priceOf(sel.value) * q;
-          summary += `${sel.value} x${q}\n`;
+          itemsSubtotal += info.price * q;
+          summary += `${info.name} x${q}\n`;
         }
       });
       const ongkir = parseInt(document.getElementById('shippingCost').value, 10) || 0;
